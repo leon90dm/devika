@@ -1,0 +1,2 @@
+export TOKENIZERS_PARALLELISM=false
+python3 devika.py
