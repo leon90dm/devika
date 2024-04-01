@@ -1,9 +1,13 @@
+from ollama import Client
 import ollama
-from src.logger import Logger
 from src.config import Config
 
-log = Logger()
+from src.logger import Logger
 
+logger = Logger()
+
+client = Client(host=Config().get_ollama_api_endpoint())
+print(client)
 
 class Ollama:
     def __init__(self):
@@ -17,8 +21,14 @@ class Ollama:
             log.warning("run ollama server to use ollama models otherwise use other models")
 
     def inference(self, model_id: str, prompt: str) -> str:
-        response = self.client.generate(
-            model=model_id,
-            prompt=prompt.strip()
-        )
-        return response['response']
+        try:
+            response = client.chat(model=model_id, messages=[
+            {
+                'role': 'user',
+                'content': prompt.strip(),
+            },
+            ])
+            return response['message']['content']
+        except Exception as e:
+            logger.error(f"Error during model inference: {e}")
+        return ""
